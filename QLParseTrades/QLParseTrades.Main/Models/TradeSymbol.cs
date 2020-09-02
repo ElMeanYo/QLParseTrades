@@ -11,9 +11,9 @@ namespace QLParseTrades.Main.Models
     /// </summary>
     public class TradeSymbol
     {
-        private List<Trade> _trades;
-
         #region Properties
+
+        public List<Trade> Trades;  // List of trades for this symbol
 
         public string Symbol { get; set; }
 
@@ -32,7 +32,7 @@ namespace QLParseTrades.Main.Models
         public TradeSymbol(string symbol)
         {
             Symbol = symbol;
-            _trades = new List<Trade>();
+            Trades = new List<Trade>();
         }
 
         #endregion
@@ -51,7 +51,7 @@ namespace QLParseTrades.Main.Models
             if (!int.TryParse(values[2], out int quantity)) return;         // Quantity
             if (!int.TryParse(values[3], out int price)) return;            // Price
 
-            _trades.Add(new Trade(timeStamp, quantity, price));
+            Trades.Add(new Trade(timeStamp, quantity, price));
         }
 
         /// <summary>
@@ -59,6 +59,7 @@ namespace QLParseTrades.Main.Models
         /// </summary>
         public void Calculate()
         {
+            if (!Trades.Any()) return;
             MaxTimeGap = CalcMaxTimeGap();
             TotalVolume = CalcTotalVolume();
             MaxPrice = CalcMaxPrice();
@@ -69,9 +70,13 @@ namespace QLParseTrades.Main.Models
 
         #region Private Methods
 
+        /// <summary>
+        /// Maximum time gap between all trades on this symbol.
+        /// </summary>
         private double CalcMaxTimeGap()
         {
-            var timeStamps = _trades.Select(t => t.TimeStamp).Distinct().OrderBy(t => t);
+            // Sort unique timestamps
+            var timeStamps = Trades.Select(t => t.TimeStamp).Distinct().OrderBy(t => t);
             double maxTimeGap = 0;
             double prevStamp = timeStamps.First();
 
@@ -85,22 +90,33 @@ namespace QLParseTrades.Main.Models
             return maxTimeGap;
         }
 
+        /// <summary>
+        /// Total volume (sum of quantities) on this symbol.
+        /// </summary>
         private int CalcTotalVolume()
         {
-            return _trades.Sum(t => t.Price);
+            return Trades.Sum(t => t.Quantity);
         }
 
+        /// <summary>
+        /// Maximum price of all trades on this symbol.
+        /// </summary>
+        /// <remarks>
+        /// Is this supposed to be Max(Price * Quantity)? Instructions unclear. Assuming Max(Price).
+        /// </remarks>
         private int CalcMaxPrice()
         {
-            return _trades.Max(t => t.Price);
+            return Trades.Max(t => t.Price);
         }
 
+        /// <summary>
+        /// Weighted Average for all trades on this symbol.
+        /// </summary>
         private int CalcWeightedAveragePrice()
         {
-            if (!_trades.Any()) return 0;
-
-            if (_trades.Sum(t => t.Quantity) != 0) // Div0 check
-                return _trades.Sum(t => (t.Price * t.Quantity)) / _trades.Sum(t => t.Quantity);
+            var totalQuantities = Trades.Sum(t => t.Quantity); // Do the quantity sum only once
+            if (totalQuantities != 0) // Divide by zero check
+                return Trades.Sum(t => (t.Price * t.Quantity)) / totalQuantities;
             else
                 return 0;
         }

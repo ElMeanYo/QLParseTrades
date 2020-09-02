@@ -11,6 +11,7 @@ namespace QLParseTrades.Main.Models
     /// </summary>
     public class TradeSymbolList
     {
+        // Use a sorted dictionary to improve lookup speeds and avoid sorting a potentially large list at the end
         public SortedDictionary<string, TradeSymbol> Symbols;
 
         #region Public Methods

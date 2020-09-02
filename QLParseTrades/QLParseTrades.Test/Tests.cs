@@ -47,6 +47,8 @@ namespace QLParseTrades.Test
             symbol.AddTrade(new string[] { "10000000", "aaa", "20", "18" });
             symbol.AddTrade(new string[] { "10010000", "aaa", "5", "7" });
 
+            Assert.IsTrue(symbol.Trades.Count == 2);
+
             symbol.Calculate();
 
             // As per the example provided in instructions.txt
@@ -54,6 +56,28 @@ namespace QLParseTrades.Test
             Assert.IsTrue(symbol.MaxTimeGap == 10000);
             Assert.IsTrue(symbol.TotalVolume == 25);
             Assert.IsTrue(symbol.WeightedAveragePrice == 15);
+
+        }
+
+        [TestMethod]
+        public void TestSymbolCalc2()
+        {
+            var symbol = new TradeSymbol("aaa");
+            Assert.IsTrue(symbol.Symbol == "aaa");
+
+            symbol.AddTrade(new string[] { "10000000", "aaa", "x", "y" });      // Test bad data
+            symbol.AddTrade(new string[] { "10010000", "aaa", "12", "45" });
+            symbol.AddTrade(new string[] { "10210000", "aaa", "3", "9" });
+            symbol.AddTrade(new string[] { "10210000", "aaa", "01", "2.2" });   // Test bad data
+
+            Assert.IsTrue(symbol.Trades.Count == 2); // Two of the trades are good
+
+            symbol.Calculate();
+
+            Assert.IsTrue(symbol.MaxPrice == 45);
+            Assert.IsTrue(symbol.MaxTimeGap == 200000);
+            Assert.IsTrue(symbol.TotalVolume == 15);
+            Assert.IsTrue(symbol.WeightedAveragePrice == 37);
 
         }
 

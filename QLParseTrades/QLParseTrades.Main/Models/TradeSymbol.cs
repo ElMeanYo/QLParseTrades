@@ -19,7 +19,7 @@ namespace QLParseTrades.Main.Models
 
         public double MaxTimeGap { get; set; }
 
-        public int TotalVolume { get; set; }
+        public int Volume { get; set; }
 
         public int MaxPrice { get; set; }
 
@@ -61,7 +61,7 @@ namespace QLParseTrades.Main.Models
         {
             if (!Trades.Any()) return;
             MaxTimeGap = CalcMaxTimeGap();
-            TotalVolume = CalcTotalVolume();
+            Volume = CalcTotalVolume();
             MaxPrice = CalcMaxPrice();
             WeightedAveragePrice = CalcWeightedAveragePrice();
         }
@@ -83,7 +83,8 @@ namespace QLParseTrades.Main.Models
             foreach (var stamp in timeStamps)
             {
                 var gap = stamp - prevStamp;
-                if (gap > maxTimeGap) maxTimeGap = gap;
+                if (gap > maxTimeGap) 
+                    maxTimeGap = gap;
                 prevStamp = stamp;
             }
 

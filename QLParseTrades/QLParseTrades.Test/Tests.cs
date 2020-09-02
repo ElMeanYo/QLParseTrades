@@ -54,11 +54,14 @@ namespace QLParseTrades.Test
             // As per the example provided in instructions.txt
             Assert.IsTrue(symbol.MaxPrice == 18);
             Assert.IsTrue(symbol.MaxTimeGap == 10000);
-            Assert.IsTrue(symbol.TotalVolume == 25);
+            Assert.IsTrue(symbol.Volume == 25);
             Assert.IsTrue(symbol.WeightedAveragePrice == 15);
 
         }
 
+        /// <summary>
+        /// Test multiple trades with bad data.
+        /// </summary>
         [TestMethod]
         public void TestSymbolCalc2()
         {
@@ -76,8 +79,30 @@ namespace QLParseTrades.Test
 
             Assert.IsTrue(symbol.MaxPrice == 45);
             Assert.IsTrue(symbol.MaxTimeGap == 200000);
-            Assert.IsTrue(symbol.TotalVolume == 15);
+            Assert.IsTrue(symbol.Volume == 15);
             Assert.IsTrue(symbol.WeightedAveragePrice == 37);
+
+        }
+
+        /// <summary>
+        /// Test a single trade
+        /// </summary>
+        [TestMethod]
+        public void TestSymbolCalc3()
+        {
+            var symbol = new TradeSymbol("aaa");
+            Assert.IsTrue(symbol.Symbol == "aaa");
+
+            symbol.AddTrade(new string[] { "10010000", "aaa", "4", "51" });
+
+            Assert.IsTrue(symbol.Trades.Count == 1); 
+
+            symbol.Calculate();
+
+            Assert.IsTrue(symbol.MaxPrice == 51);
+            Assert.IsTrue(symbol.MaxTimeGap == 0);
+            Assert.IsTrue(symbol.Volume == 4);
+            Assert.IsTrue(symbol.WeightedAveragePrice == 51);
 
         }
 

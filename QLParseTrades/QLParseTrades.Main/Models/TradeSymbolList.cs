@@ -31,6 +31,7 @@ namespace QLParseTrades.Main.Models
                     var line = reader.ReadLine();
                     var values = line.Split(',');   // Split by commas
 
+                    if (values.Length < 4) continue;                // Must be 4 columns
                     if (string.IsNullOrEmpty(values[1])) continue;  // Ensure there is a symbol
 
                     var tradeSymbol = GetSymbol(values[1]);         // Get/Create the trade symbol
@@ -60,7 +61,7 @@ namespace QLParseTrades.Main.Models
             var sb = new StringBuilder();
 
             foreach (var s in Symbols.Values)
-                sb.AppendLine($@"{s.Symbol},{s.MaxTimeGap},{s.TotalVolume},{s.WeightedAveragePrice},{s.MaxPrice}");
+                sb.AppendLine($@"{s.Symbol},{s.MaxTimeGap},{s.Volume},{s.WeightedAveragePrice},{s.MaxPrice}");
 
             // This overwrites.  You could provide a parameter to append instead of overwrite (AppendAllLines).
             File.WriteAllText(fileName, sb.ToString());
